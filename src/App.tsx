@@ -11,6 +11,9 @@ import {
   createAssistant,
   AssistantAppState,
 } from "@sberdevices/assistant-client";
+// import { Button } from '@sberdevices/ui/components/Button/Button';
+import { Container } from '@sberdevices/ui/components/Grid';
+import { Button } from '@sberdevices/ui';
 import "./App.css";
 
 import { reducer } from "./store";
@@ -69,6 +72,7 @@ export const App: FC = memo(() => {
   return (
     <main className="container">
       {/* <input type="button" value={appState.button_state ? "Ура!" : "Я кнопка"} className="Button1" /> */}
+      {/* <Button text="Hello Plasma!!!" view="checked" /> */}
       <ul className="cards">
         {appState.cards.map((card, index) => (
           <li className="card" key={card.name}>
