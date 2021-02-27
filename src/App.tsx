@@ -1,19 +1,32 @@
-import React, {
-  FC,
-  memo,
-  useReducer,
-  useState,
-  useRef,
-  useEffect,
-} from "react";
-import {
-  createSmartappDebugger,
-  createAssistant,
-  AssistantAppState,
-} from "@sberdevices/assistant-client";
-import "./App.css";
+import React from 'react';
+// createGlobalStyle нужен для создания глобальных стилей
+import { createGlobalStyle } from 'styled-components';
+// получаем тему персонажа
+import { darkSber } from '@sberdevices/plasma-tokens/themes';
+// получаем цвета для нашего интерфейса
+import {text, background, gradient, accent} from '@sberdevices/plasma-tokens';
 
+import {createAssistant, createSmartappDebugger} from '@sberdevices/assistant-client'
+
+import {Container, Header, Row, Col, Cell, CellIcon, TextBox, Button, Card, CardContent, TextBoxBigTitle, TextBoxSubTitle, TextBoxBiggerTitle} from '@sberdevices/ui';
 import { reducer } from "./store";
+import { gridMargins } from '@sberdevices/ui/utils';
+import { headline1 } from '@sberdevices/plasma-tokens';
+
+
+const DocStyles = createGlobalStyle`
+  html {
+    color: ${text};
+    background-color: ${background};
+    background-image: ${gradient};
+
+    /** необходимо залить градиентом всю подложку */
+    min-height: 100vh;
+  }
+`;
+
+// создаем react-компонент для персонажа
+const Theme = createGlobalStyle(darkSber);
 
 const initializeAssistant = (getState: any) => {
   if (process.env.NODE_ENV === "development") {
@@ -27,77 +40,74 @@ const initializeAssistant = (getState: any) => {
   return createAssistant({ getState });
 };
 
-export const App: FC = memo(() => {
-  const [appState, dispatch] = useReducer(reducer, { notes: [] });
+const App = () => {
 
-  const [note, setNote] = useState("");
+    return (
+        <div>
+            <Theme/>
+            <DocStyles/>
+            <Container>
+                <Header
+                    back={true}
+                    logo="./logo192.png"
+                    logoAlt="Logo"
+                    title="Выберите уровень"
+                    subtitle="10 слов дня"
+                    onBackClick={() => console.log('Back click!')}
+                >
+                </Header>
 
-  const assistantStateRef = useRef<AssistantAppState>();
-  const assistantRef = useRef<ReturnType<typeof createAssistant>>();
+                <Row>
+                    <Col type="rel" size={1}></Col>
+                    <Col type="rel" size={2}>
+                        <Card style={{ width: '20rem' }}>
+                            <CardContent compact>
+                                <TextBoxBigTitle></TextBoxBigTitle>
+                                <TextBoxBigTitle></TextBoxBigTitle>
+                                <TextBoxBigTitle></TextBoxBigTitle>
+                                <span style={headline1}>
+                                Новичок
+                                </span>
+                                <TextBoxBigTitle></TextBoxBigTitle>
+                            </CardContent>
+                        </Card>
+                    </Col>
+                    <Col type="rel" size={2}>
+                        <Card style={{ width: '20rem' }}>
+                            <CardContent compact>
+                                <TextBoxBigTitle></TextBoxBigTitle>
+                                <TextBoxBigTitle></TextBoxBigTitle>
+                                <TextBoxBigTitle></TextBoxBigTitle>
+                                <span style={headline1}>
+                                Средний
+                                </span>
+                                <TextBoxBigTitle></TextBoxBigTitle>
+                            </CardContent>
+                        </Card>
+                    </Col>
+                    <Col type="rel" size={1}></Col>
+                </Row>
 
-  useEffect(() => {
-    assistantRef.current = initializeAssistant(() => assistantStateRef.current);
+                <Row style={{margin: "20px"}}>
+                    <Col type="rel" size={2}></Col>
+                    <Col type="rel" size={2}>
+                        <Card style={{ width: '20rem' }}>
+                            <CardContent compact>
+                                <TextBoxBigTitle></TextBoxBigTitle>
+                                <TextBoxBigTitle></TextBoxBigTitle>
+                                <TextBoxBigTitle></TextBoxBigTitle>
+                                <span style={headline1}>
+                                Опытный
+                                </span>
+                                <TextBoxBigTitle></TextBoxBigTitle>
+                            </CardContent>
+                        </Card>
+                    </Col>
+                    <Col type="rel" size={2}></Col>
+                </Row>
+            </Container>
+        </div>
+    );
+};
 
-    assistantRef.current.on("data", ({ action }: any) => {
-      if (action) {
-        dispatch(action);
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    assistantStateRef.current = {
-      item_selector: {
-        items: appState.notes.map(({ id, title }, index) => ({
-          number: index + 1,
-          id,
-          title,
-        })),
-      },
-    };
-  }, [appState]);
-
-  return (
-    <main className="container">
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          dispatch({ type: "add_note", note });
-          setNote("");
-        }}
-      >
-        <input
-          className="add-note"
-          type="text"
-          placeholder="Add Note"
-          value={note}
-          onChange={({ target: { value } }) => setNote(value)}
-          required
-          autoFocus
-        />
-      </form>
-      <ul className="notes">
-        {appState.notes.map((note, index) => (
-          <li className="note" key={note.id}>
-            <span>
-              <span style={{ fontWeight: "bold" }}>{index + 1}. </span>
-              <span
-                style={{
-                  textDecorationLine: note.completed ? "line-through" : "none",
-                }}
-              >
-                {note.title}
-              </span>
-            </span>
-            <input
-              className="done-note"
-              type="checkbox"
-              checked={note.completed}
-              onChange={() => dispatch({ type: "done_note", id: note.id })}
-            />
-          </li>
-        ))}
-      </ul>
-    </main>
-  );
-});
+export default App;
