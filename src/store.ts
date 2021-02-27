@@ -1,3 +1,8 @@
+type Card = {
+  name: string;
+  selected: boolean;
+};
+
 type Note = {
   id: string;
   title: string;
@@ -6,6 +11,8 @@ type Note = {
 
 type State = {
   notes: Array<Note>;
+  button_state: boolean;
+  cards: Array<Card>;
 };
 
 type Action =
@@ -20,7 +27,23 @@ type Action =
   | {
       type: "delete_note";
       id: string;
+    }
+  | {
+      type: "button_action";
+    }
+  | {
+      type: "choose_action";
+      name: string;
+    }
+  | {
+      type: "unchoose_action";
+      name: string;
     };
+
+const compare_names = (card_name: string, request_name: string) => {
+  let len = Math.max(card_name.length, request_name.length) - 1;
+  return card_name.toLowerCase().substr(0, len) === request_name.toLowerCase().substr(0, len);
+};
 
 export const reducer = (state: State, action: Action) => {
   switch (action.type) {
@@ -50,6 +73,29 @@ export const reducer = (state: State, action: Action) => {
         ...state,
         notes: state.notes.filter(({ id }) => id !== action.id),
       };
+
+    case "button_action":
+      return {
+        ...state,
+        button_state: true,
+      };
+
+    case "choose_action":
+      return {
+        ...state,
+        cards: state.cards.map((card) =>
+          compare_names(card.name, action.name) ? { ...card, selected: true } : card
+        ),
+      };
+    
+    case "unchoose_action":
+      return {
+        ...state,
+        cards: state.cards.map((card) =>
+          !compare_names(card.name, action.name) ? { ...card, selected: true } : card
+        ),
+      };
+
 
     default:
       throw new Error();

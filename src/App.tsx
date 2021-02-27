@@ -28,9 +28,18 @@ const initializeAssistant = (getState: any) => {
 };
 
 export const App: FC = memo(() => {
-  const [appState, dispatch] = useReducer(reducer, { notes: [] });
+  const [appState, dispatch] = useReducer(reducer, { notes: [], button_state: false, cards: [
+                                                                                        {name: "Погода", selected: false},
+                                                                                        {name: "Пробки", selected: false},
+                                                                                        {name: "Валюты", selected: false},
+                                                                                        {name: "Спорт", selected: false},
+                                                                                        {name: "Гигиена", selected: false},
+                                                                                        {name: "Английский", selected: false},
+                                                                                        {name: "Новости", selected: false},
+                                                                                        {name: "Искусство", selected: false},
+                                                                                      ] });
 
-  const [note, setNote] = useState("");
+  // const [note, setNote] = useState("");
 
   const assistantStateRef = useRef<AssistantAppState>();
   const assistantRef = useRef<ReturnType<typeof createAssistant>>();
@@ -59,7 +68,24 @@ export const App: FC = memo(() => {
 
   return (
     <main className="container">
-      <form
+      {/* <input type="button" value={appState.button_state ? "Ура!" : "Я кнопка"} className="Button1" /> */}
+      <ul className="cards">
+        {appState.cards.map((card, index) => (
+          <li className="card" key={card.name}>
+            <span>
+              <span style={{ fontWeight: "bold" }}>{index + 1}. </span>
+              <span
+                style={{
+                  textDecorationLine: card.selected ? "line-through" : "none",
+                }}
+              >
+                {card.name}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ul>
+      {/* <form
         onSubmit={(event) => {
           event.preventDefault();
           dispatch({ type: "add_note", note });
@@ -97,7 +123,7 @@ export const App: FC = memo(() => {
             />
           </li>
         ))}
-      </ul>
+      </ul> */}
     </main>
   );
 });
